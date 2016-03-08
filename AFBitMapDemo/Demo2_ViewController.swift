@@ -28,8 +28,8 @@ class Demo2_ViewController: UIViewController {
         
         // 设置可拖动的按钮
         let v0 = UIView(frame: CGRectMake(50, 150, 20, 20))
-        let v1 = UIView(frame: CGRectMake(300, 150, 20, 20))
-        let v2 = UIView(frame: CGRectMake(300, 400, 20, 20))
+        let v1 = UIView(frame: CGRectMake(200, 150, 20, 20))
+        let v2 = UIView(frame: CGRectMake(200, 400, 20, 20))
         let v3 = UIView(frame: CGRectMake(50, 400, 20, 20))
         views = [v0,v1,v2,v3]
         

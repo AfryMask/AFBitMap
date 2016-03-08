@@ -22,8 +22,8 @@ class Demo2_ShapeImageView: UIImageView {
         // 当前view距父View左上角的相对距离，和理论大小
         let minLeft = min(min(p0.x, p1.x), min(p2.x, p3.x));
         let minTop = min(min(p0.y, p1.y), min(p2.y, p3.y));
-        let shapeWidth = max(max(p0.x, p1.x), max(p2.x, p3.x))-min(min(p0.x, p1.x), min(p2.x, p3.x));
-        let shapeHeight = max(max(p0.y, p1.y), max(p2.y, p3.y))-min(min(p0.y, p1.y), min(p2.y, p3.y));
+        let shapeWidth = Int(max(max(p0.x, p1.x), max(p2.x, p3.x))-min(min(p0.x, p1.x), min(p2.x, p3.x)))
+        let shapeHeight = Int(max(max(p0.y, p1.y), max(p2.y, p3.y))-min(min(p0.y, p1.y), min(p2.y, p3.y)))
         
         // 修正点的位置为相对自身
         p0.x = p0.x - minLeft;
@@ -74,15 +74,15 @@ class Demo2_ShapeImageView: UIImageView {
         let newImgData = unsafeBitCast(CGBitmapContextGetData(imgContext), UnsafeMutablePointer<CUnsignedChar>.self)
         
         // 计算总大小,申请内存空间
-        let shapeByteCount = Int((shapeWidth * shapeHeight) * 4)
+        let shapeByteCount = shapeWidth * shapeHeight * 4
         let shapeVoideData = malloc(shapeByteCount)
         defer {free(shapeVoideData)}
         let shapeData = unsafeBitCast(shapeVoideData, UnsafeMutablePointer<CUnsignedChar>.self)
         
         // 初始化数据
         for (var i=0; i<Int(shapeHeight); i++) {
-            for (var j=0; j<Int(shapeWidth); j++) {
-                let offset = (i*Int(shapeWidth) + j)*4
+            for (var j=0; j<shapeWidth; j++) {
+                let offset = (i*shapeWidth + j)*4
                 (shapeData+offset).memory = 0
                 (shapeData+offset+1).memory = 0
                 (shapeData+offset+2).memory = 0
@@ -91,10 +91,10 @@ class Demo2_ShapeImageView: UIImageView {
         }
         
         // 数据处理
-        for (var i=0; i<Int(imgHeight)-1; i++) {
-            for (var j=0; j<Int(imgWidth)-1; j++) {
+        for (var i=0; i<imgHeight-1; i++) {
+            for (var j=0; j<imgWidth-1; j++) {
                 // 在原图中的位置
-                let offset = (i*Int(imgWidth) + j)*4
+                let offset = (i*imgWidth + j)*4
                 
                 // 计算原图每个点在新图中的位置
                 let xFactor = CGFloat(j)/CGFloat(imgWidth)
@@ -112,7 +112,7 @@ class Demo2_ShapeImageView: UIImageView {
                 delY = (bottom.y-top.y)*yFactor
                 let newPoint = CGPointMake(top.x+delX, top.y+delY)
                 
-                let newIndex = (Int(newPoint.y)*Int(shapeWidth)+Int(newPoint.x))*4
+                let newIndex = (Int(newPoint.y)*shapeWidth+Int(newPoint.x))*4
                 
                 // 修改值
                 (shapeData+newIndex).memory = (newImgData+offset).memory
@@ -124,14 +124,14 @@ class Demo2_ShapeImageView: UIImageView {
         }
         
         // 创建新图的上下文
-        let shapeContext = CGBitmapContextCreateWithData(shapeData,
-                                                    Int(shapeWidth),
-                                                    Int(shapeHeight),
-                                                    8,      // bits per component
-                                                    Int(shapeWidth)*4,
-                                                    colorSpace,
-                                                    CGImageAlphaInfo.PremultipliedFirst.rawValue,
-                                                    nil,nil);
+        let shapeContext = CGBitmapContextCreate(shapeData,
+                                                shapeWidth,
+                                                shapeHeight,
+                                                8,      // bits per component
+                                                shapeWidth*4,
+                                                colorSpace,
+                                                CGImageAlphaInfo.PremultipliedFirst.rawValue)
+        
         
         let outImage = CGBitmapContextCreateImage(shapeContext)
         
@@ -139,7 +139,7 @@ class Demo2_ShapeImageView: UIImageView {
         let img = UIImage(CGImage: outImage!)
         
         // 配置新图片
-        self.frame = CGRectMake(minLeft, minTop, shapeWidth, shapeHeight)
+        self.frame = CGRectMake(minLeft, minTop, CGFloat(shapeWidth), CGFloat(shapeHeight))
         self.image = img
     }
 }
