@@ -8,4 +8,4 @@ Demo2:可变形的Image
 ![](/GIF/Demo2.gif)  
 
 
-[1]:[http://www.jianshu.com/p/84addd11e679]
+[1]: [http://www.jianshu.com/p/84addd11e679]
